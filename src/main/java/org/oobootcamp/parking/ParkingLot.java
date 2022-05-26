@@ -54,7 +54,8 @@ public class ParkingLot {
     }
 
     public boolean carOut(Car car) {
-        var records = this.parkingRecords.stream().filter(parkingRecord -> parkingRecord.getPlatNumber().equals(car.platNumber()) && parkingRecord.getEntryTime() != null).toList();
+        // 当进入时间存在 且离开时间为null的时候才可以离开 - 历史记录已经离开了
+        var records = this.parkingRecords.stream().filter(parkingRecord -> parkingRecord.getPlatNumber().equals(car.platNumber()) && parkingRecord.getEntryTime() != null && parkingRecord.getLeaveTime() == null).toList();
         if (records.size() == 1) {
             records.get(0).setLeaveTime(LocalDateTime.now());
             this.remainingCapacity += 1;

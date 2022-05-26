@@ -1,5 +1,6 @@
 package org.oobootcamp.warmup.length;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.oobootcamp.parking.Car;
@@ -26,7 +27,8 @@ class ParkingLotTest {
 
         Executable executable = () -> new ParkingLot(capacity);
 
-        assertThrows(InvalidParameterException.class, executable);
+        InvalidParameterException invalidParameterException = assertThrows(InvalidParameterException.class, executable);
+        Assertions.assertEquals("capacity must bigger than 0.", invalidParameterException.getMessage());
     }
 
     @Test
@@ -72,8 +74,31 @@ class ParkingLotTest {
     }
 
     @Test
-    void should_forbid_out_when_parking_in_record_not_exist_given_car_wanna_out() {
+    void should_forbid_out_when_no_record__exist_given_car_wanna_out() {
+        var parkingLot = new ParkingLot(10);
+        var car1 = new Car("鄂A 88888");
+        var car2 = new Car("鄂A 66666");
+        var carNotIn = new Car("鄂B 66667");
+        parkingLot.carIn(car1);
+        parkingLot.carIn(car2);
 
+
+        var allowOut = parkingLot.carOut(carNotIn);
+
+        assertEquals(false, allowOut);
+    }
+    @Test
+    void should_forbid_out_when_no_new_car_in_record__exist_given_car_wanna_out() {
+        var parkingLot = new ParkingLot(10);
+        var car1 = new Car("鄂A 88888");
+        var car2 = new Car("鄂A 66666");
+        parkingLot.carIn(car1);
+        parkingLot.carIn(car2);
+        parkingLot.carOut(car2);
+
+        var allowOut = parkingLot.carOut(car2);
+
+        assertEquals(false, allowOut);
     }
 
     @Test
@@ -100,6 +125,7 @@ class ParkingLotTest {
 
         Executable executable = () -> parkingLot.setCapacity(1);
 
-        assertThrows(InvalidParameterException.class, executable);
+        InvalidParameterException invalidParameterException = assertThrows(InvalidParameterException.class, executable);
+        assertEquals("capacity must not less than parked cars number, current parked cars number: 2.", invalidParameterException.getMessage());
     }
 }
