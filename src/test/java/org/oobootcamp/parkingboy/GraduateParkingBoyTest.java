@@ -34,7 +34,7 @@ class GraduateParkingBoyTest {
         Car car2 = new Car("鄂A 88887");
         graduateParkingBoy.parkCar(car1);
 
-        Executable executable = () -> graduateParkingBoy.parkCar(car2);;
+        Executable executable = () -> graduateParkingBoy.parkCar(car2);
 
         assertThrows(NoAvailableParkingLotException.class, executable);
     }
