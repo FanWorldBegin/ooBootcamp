@@ -10,7 +10,6 @@ import org.oobootcamp.parking.Ticket;
 import java.security.InvalidParameterException;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -40,13 +39,8 @@ class ParkingLotTest {
         var car = new Car("鄂A 88888");
         Optional<Ticket> ticket = parkingLot.carIn(car);
 
-        assertNotNull(ticket);
+        assertFalse(ticket.isEmpty());
         assertEquals(car.platNumber(), ticket.get().platNumber());
-
-        assertEquals(1, parkingLot.getParkingRecords().size());
-        assertNotNull(parkingLot.getParkingRecords().get(0).getEntryTime());
-        assertEquals(car.platNumber(), parkingLot.getParkingRecords().get(0).getPlatNumber());
-        assertEquals(9, parkingLot.getRemainingCapacity());
     }
 
     @Test
@@ -71,10 +65,10 @@ class ParkingLotTest {
         var allowOut = parkingLot.carOut(ticket1.get());
 
         assertTrue(allowOut);
-        assertEquals(2, parkingLot.getParkingRecords().size());
-        assertNotNull(parkingLot.getParkingRecords().get(0).getLeaveTime());
-        assertEquals(car1.platNumber(), parkingLot.getParkingRecords().get(0).getPlatNumber());
-        assertEquals(9, parkingLot.getRemainingCapacity());
+//        assertEquals(2, parkingLot.getParkingRecords().size());
+//        assertNotNull(parkingLot.getParkingRecords().get(0).getLeaveTime());
+//        assertEquals(car1.platNumber(), parkingLot.getParkingRecords().get(0).getPlatNumber());
+//        assertEquals(9, parkingLot.getRemainingCapacity());
     }
 
     @Test
@@ -82,13 +76,13 @@ class ParkingLotTest {
         var parkingLot = new ParkingLot(10);
         var car1 = new Car("鄂A 88888");
         var car2 = new Car("鄂A 66666");
-        Optional<Ticket> ticket1 = parkingLot.carIn(car1);
+        parkingLot.carIn(car1);
         Optional<Ticket> ticket2 = parkingLot.carIn(car2);
         parkingLot.carOut(ticket2.get());
 
         var allowOut = parkingLot.carOut(ticket2.get());
 
-        assertEquals(false, allowOut);
+        assertFalse(allowOut);
     }
 
     @Test
