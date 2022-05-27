@@ -1,11 +1,12 @@
 package org.oobootcamp.parkingboy;
 
 
+import org.oobootcamp.exception.NoAvailableParkingLotException;
+import org.oobootcamp.exception.NoMatchedParkingLotException;
 import org.oobootcamp.parking.Car;
 import org.oobootcamp.parking.ParkingLot;
 import org.oobootcamp.parking.Ticket;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,16 +24,16 @@ public class GraduateParkingBoy {
                 .findFirst();
     }
 
-    Optional<Ticket> parkCar(Car car) throws Exception {
-        ParkingLot parkingLot = findAvailableParkingLot().orElseThrow(Exception::new);
+    Optional<Ticket> parkCar(Car car) throws NoAvailableParkingLotException {
+        ParkingLot parkingLot = findAvailableParkingLot().orElseThrow(NoAvailableParkingLotException::new);
         return parkingLot.carIn(car);
     }
 
-    boolean pickCar(Ticket ticket) throws Exception {
+    boolean pickCar(Ticket ticket) throws NoMatchedParkingLotException {
         ParkingLot parkingLot = managedParkingLots.stream()
                                                   .filter(n -> n.getParkingLotNumber() == ticket.parkingLotNumber())
                                                   .findAny()
-                                                  .orElseThrow(Exception::new);
+                                                  .orElseThrow(NoMatchedParkingLotException::new);
         return parkingLot.carOut(ticket);
     }
 }

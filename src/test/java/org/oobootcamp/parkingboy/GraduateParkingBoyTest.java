@@ -2,11 +2,11 @@ package org.oobootcamp.parkingboy;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.oobootcamp.exception.NoAvailableParkingLotException;
+import org.oobootcamp.exception.NoMatchedParkingLotException;
 import org.oobootcamp.parking.Car;
 import org.oobootcamp.parking.ParkingLot;
 import org.oobootcamp.parking.Ticket;
-
-import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +17,6 @@ class GraduateParkingBoyTest {
 //  AC1
     @Test
     void should_return_a_ticket_when_boy_parking_a_car_given_a_parking_lot_with_space_and_a_car() throws Exception {
-
         ParkingLot parkingLotOne = new ParkingLot(2);
         GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLotOne));
         Car car = new Car("鄂A 88888");
@@ -37,7 +36,7 @@ class GraduateParkingBoyTest {
 
         Executable executable = () -> graduateParkingBoy.parkCar(car2);;
 
-        assertThrows(Exception.class, executable);
+        assertThrows(NoAvailableParkingLotException.class, executable);
     }
 
 //  AC2
@@ -50,14 +49,12 @@ class GraduateParkingBoyTest {
         Car car2 = new Car("鄂A 88887");
 
         parkingLot2.carIn(car2);
-
         GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLot2, parkingLot1));
+
         Optional<Ticket> ticket = graduateParkingBoy.parkCar(car1);
 
         assertNotNull(ticket);
         assertEquals(parkingLot1.getParkingLotNumber(), ticket.get().parkingLotNumber());
-
-
     }
 
     @Test
@@ -69,8 +66,8 @@ class GraduateParkingBoyTest {
         Car car2 = new Car("鄂A 88887");
 
         parkingLot1.carIn(car1);
-
         GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLot2, parkingLot1));
+
         Optional<Ticket> ticket = graduateParkingBoy.parkCar(car2);
 
         assertNotNull(ticket);
@@ -90,8 +87,9 @@ class GraduateParkingBoyTest {
 
         GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLot2, parkingLot1));
 
-        Executable executable = () -> graduateParkingBoy.parkCar(car2);;
-        assertThrows(Exception.class, executable);
+        Executable executable = () -> graduateParkingBoy.parkCar(car2);
+
+        assertThrows(NoAvailableParkingLotException.class, executable);
     }
 
 //    AC3
@@ -109,7 +107,6 @@ class GraduateParkingBoyTest {
         Optional<Ticket> ticket1 = graduateParkingBoy.parkCar(car1);
         graduateParkingBoy.parkCar(car2);
 
-//      when
         boolean findCar = graduateParkingBoy.pickCar(ticket1.get());
 
        assertTrue(findCar);
@@ -118,21 +115,35 @@ class GraduateParkingBoyTest {
     }
 
     @Test
-    void should_failed_when_boy_pick_up_the_car_given_two_parking_lot_without_the_car_given_a_ticket() throws Exception {
+    void should_failed_when_boy_pick_up_the_car_given_two_parking_lot_without_the_car_and_a_ticket() throws Exception {
         ParkingLot parkingLot1 = new ParkingLot(1);
         ParkingLot parkingLot2 = new ParkingLot(1);
 
         Ticket ticket = new Ticket("鄂A 88888", LocalDateTime.now(), parkingLot1.getParkingLotNumber());
 
         GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLot2, parkingLot1));
+
         boolean findCar = graduateParkingBoy.pickCar(ticket);
 
         assertFalse(findCar);
     }
 
     @Test
-    void should_failed_when_boy_pick_up_the_car_twice_given_two_parking_lot_with_the_car_given_a_ticket() throws Exception {
+    void should_failed_when_boy_pick_up_the_car_given_two_parking_lot_without_the_car_and_a_ticket_with_wrong_parking_lot_number() {
+        ParkingLot parkingLot1 = new ParkingLot(1);
+        ParkingLot parkingLot2 = new ParkingLot(1);
 
+        Ticket ticket = new Ticket("鄂A 88888", LocalDateTime.now(), 1);
+
+        GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLot2, parkingLot1));
+
+        Executable executable = () ->  graduateParkingBoy.pickCar(ticket);
+        assertThrows(NoMatchedParkingLotException.class, executable);
+    }
+
+
+    @Test
+    void should_failed_when_boy_pick_up_the_car_twice_given_two_parking_lot_with_the_car_and__a_ticket() throws Exception {
         ParkingLot parkingLot1 = new ParkingLot(1);
         ParkingLot parkingLot2 = new ParkingLot(1);
 
@@ -145,11 +156,10 @@ class GraduateParkingBoyTest {
         graduateParkingBoy.parkCar(car2);
         graduateParkingBoy.pickCar(ticket1.get());
 
-//      when
+
         boolean findCar = graduateParkingBoy.pickCar(ticket1.get());
 
         assertFalse(findCar);
-
     }
 
 }
