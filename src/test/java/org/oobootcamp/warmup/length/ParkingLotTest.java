@@ -5,9 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.oobootcamp.parking.Car;
 import org.oobootcamp.parking.ParkingLot;
+import org.oobootcamp.parking.Ticket;
 
 import java.security.InvalidParameterException;
+import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -35,10 +38,11 @@ class ParkingLotTest {
     void should_allow_in_and_create_parking_record_and_minus_remaining_capacity_when_remaining_capacity_bigger_than_zero_given_car_wanna_in() {
         var parkingLot = new ParkingLot(10);
         var car = new Car("鄂A 88888");
+        Optional<Ticket> ticket = parkingLot.carIn(car);
 
-        var allowIn = parkingLot.carIn(car);
+        assertNotNull(ticket);
+        assertEquals(car.platNumber(), ticket.get().platNumber());
 
-        assertTrue(allowIn);
         assertEquals(1, parkingLot.getParkingRecords().size());
         assertNotNull(parkingLot.getParkingRecords().get(0).getEntryTime());
         assertEquals(car.platNumber(), parkingLot.getParkingRecords().get(0).getPlatNumber());
@@ -52,8 +56,8 @@ class ParkingLotTest {
         var car2 = new Car("鄂A 66666");
         parkingLot.carIn(car1);
 
-        var allowIn = parkingLot.carIn(car2);
-        assertFalse(allowIn);
+        Optional<Ticket> ticket = parkingLot.carIn(car2);
+        assertTrue(ticket.isEmpty());
     }
 
     @Test
@@ -61,10 +65,10 @@ class ParkingLotTest {
         var parkingLot = new ParkingLot(10);
         var car1 = new Car("鄂A 88888");
         var car2 = new Car("鄂A 66666");
-        parkingLot.carIn(car1);
+        Optional<Ticket> ticket1 = parkingLot.carIn(car1);
         parkingLot.carIn(car2);
 
-        var allowOut = parkingLot.carOut(car1);
+        var allowOut = parkingLot.carOut(ticket1.get());
 
         assertTrue(allowOut);
         assertEquals(2, parkingLot.getParkingRecords().size());
@@ -74,29 +78,15 @@ class ParkingLotTest {
     }
 
     @Test
-    void should_forbid_out_when_no_record__exist_given_car_wanna_out() {
-        var parkingLot = new ParkingLot(10);
-        var car1 = new Car("鄂A 88888");
-        var car2 = new Car("鄂A 66666");
-        var carNotIn = new Car("鄂B 66667");
-        parkingLot.carIn(car1);
-        parkingLot.carIn(car2);
-
-
-        var allowOut = parkingLot.carOut(carNotIn);
-
-        assertEquals(false, allowOut);
-    }
-    @Test
     void should_forbid_out_when_no_new_car_in_record__exist_given_car_wanna_out() {
         var parkingLot = new ParkingLot(10);
         var car1 = new Car("鄂A 88888");
         var car2 = new Car("鄂A 66666");
-        parkingLot.carIn(car1);
-        parkingLot.carIn(car2);
-        parkingLot.carOut(car2);
+        Optional<Ticket> ticket1 = parkingLot.carIn(car1);
+        Optional<Ticket> ticket2 = parkingLot.carIn(car2);
+        parkingLot.carOut(ticket2.get());
 
-        var allowOut = parkingLot.carOut(car2);
+        var allowOut = parkingLot.carOut(ticket2.get());
 
         assertEquals(false, allowOut);
     }
