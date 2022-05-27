@@ -1,4 +1,4 @@
 package org.oobootcamp.exception;
 
-public class NoAvailableParkingLotException extends Exception{
+public class NoAvailableParkingLotException extends Exception {
 }
