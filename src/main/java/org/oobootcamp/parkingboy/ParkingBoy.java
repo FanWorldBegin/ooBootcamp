@@ -1,26 +1,29 @@
 package org.oobootcamp.parkingboy;
 
-
 import org.oobootcamp.exception.NoAvailableParkingLotException;
 import org.oobootcamp.exception.NoMatchedParkingLotException;
 import org.oobootcamp.parking.Car;
 import org.oobootcamp.parking.ParkingLot;
 import org.oobootcamp.parking.Ticket;
+import org.oobootcamp.parkingboy.strategy.FindParkingLotStrategy;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class GraduateParkingBoy {
-    List<ParkingLot> managedParkingLots;
+public class ParkingBoy {
 
-    public GraduateParkingBoy(List<ParkingLot> managedParkingLots) {
-        this.managedParkingLots = managedParkingLots;
+    private final List<ParkingLot> managedParkingLots;
+
+    private final FindParkingLotStrategy strategy;
+
+    public ParkingBoy(FindParkingLotStrategy strategy, ParkingLot... managedParkingLots) {
+        this.strategy = strategy;
+        this.managedParkingLots = Arrays.asList(managedParkingLots);
     }
 
-    private Optional<ParkingLot> findAvailableParkingLot() {
-        return managedParkingLots.stream()
-                                 .filter(ParkingLot::hasSpace)
-                                 .findFirst();
+    public Optional<ParkingLot> findAvailableParkingLot() {
+        return strategy.findAvailableParkingLot(managedParkingLots);
     }
 
     Optional<Ticket> parkCar(Car car) throws NoAvailableParkingLotException {
