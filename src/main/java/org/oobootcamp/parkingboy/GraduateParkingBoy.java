@@ -19,9 +19,8 @@ public class GraduateParkingBoy {
 
     private Optional<ParkingLot> findAvailableParkingLot() {
         return managedParkingLots.stream()
-                .sorted((o1, o2) -> o2.getParkingLotNumber() - o1.getParkingLotNumber())
-                .filter(parkingLot -> parkingLot.getRemainingCapacity() > 0)
-                .findFirst();
+                                 .filter(ParkingLot::hasSpace)
+                                 .findFirst();
     }
 
     Optional<Ticket> parkCar(Car car) throws NoAvailableParkingLotException {
@@ -29,7 +28,7 @@ public class GraduateParkingBoy {
         return parkingLot.carIn(car);
     }
 
-    boolean pickCar(Ticket ticket) throws NoMatchedParkingLotException {
+    Car pickCar(Ticket ticket) throws NoMatchedParkingLotException {
         ParkingLot parkingLot = managedParkingLots.stream()
                                                   .filter(n -> n.getParkingLotNumber() == ticket.parkingLotNumber())
                                                   .findAny()

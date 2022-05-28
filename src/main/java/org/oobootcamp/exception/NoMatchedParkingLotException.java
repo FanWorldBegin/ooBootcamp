@@ -1,4 +1,4 @@
 package org.oobootcamp.exception;
 
-public class NoMatchedParkingLotException extends Exception {
+public class NoMatchedParkingLotException extends RuntimeException {
 }

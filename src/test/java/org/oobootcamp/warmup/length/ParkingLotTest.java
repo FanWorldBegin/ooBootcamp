@@ -3,6 +3,7 @@ package org.oobootcamp.warmup.length;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.oobootcamp.exception.CarNotFoundException;
 import org.oobootcamp.parking.Car;
 import org.oobootcamp.parking.ParkingLot;
 import org.oobootcamp.parking.Ticket;
@@ -40,7 +41,7 @@ class ParkingLotTest {
         Optional<Ticket> ticket = parkingLot.carIn(car);
 
         assertFalse(ticket.isEmpty());
-        assertEquals(car.platNumber(), ticket.get().platNumber());
+        assertEquals(car.plateNumber(), ticket.get().plateNumber());
     }
 
     @Test
@@ -62,12 +63,12 @@ class ParkingLotTest {
         Optional<Ticket> ticket1 = parkingLot.carIn(car1);
         parkingLot.carIn(car2);
 
-        var allowOut = parkingLot.carOut(ticket1.get());
+        var car = parkingLot.carOut(ticket1.get());
 
-        assertTrue(allowOut);
+        assertNotNull(car);
 //        assertEquals(2, parkingLot.getParkingRecords().size());
 //        assertNotNull(parkingLot.getParkingRecords().get(0).getLeaveTime());
-//        assertEquals(car1.platNumber(), parkingLot.getParkingRecords().get(0).getPlatNumber());
+//        assertEquals(car1.plateNumber(), parkingLot.getParkingRecords().get(0).getPlatNumber());
 //        assertEquals(9, parkingLot.getRemainingCapacity());
     }
 
@@ -80,9 +81,9 @@ class ParkingLotTest {
         Optional<Ticket> ticket2 = parkingLot.carIn(car2);
         parkingLot.carOut(ticket2.get());
 
-        var allowOut = parkingLot.carOut(ticket2.get());
+        Executable executable = () -> parkingLot.carOut(ticket2.get());
 
-        assertFalse(allowOut);
+        assertThrows(CarNotFoundException.class, executable);
     }
 
     @Test

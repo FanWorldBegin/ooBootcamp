@@ -1,16 +1,18 @@
 package org.oobootcamp.parking;
 
+import org.oobootcamp.exception.CarNotFoundException;
+
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class ParkingLot {
     private int capacity;
     private int remainingCapacity;
-    private final List<ParkingRecord> parkingRecords;
-    private int parkingLotNumber;
+    private final Map<Ticket, Car> parkedCars;
+    private final int parkingLotNumber;
 
     public ParkingLot(int capacity) {
         if (capacity < 1) {
@@ -18,7 +20,7 @@ public class ParkingLot {
         }
         this.capacity = capacity;
         this.remainingCapacity = capacity;
-        this.parkingRecords = new ArrayList<>();
+        this.parkedCars = new HashMap<>();
         parkingLotNumber = (int) System.currentTimeMillis();
     }
 
@@ -42,34 +44,26 @@ public class ParkingLot {
         if (remainingCapacity < 1) {
             return Optional.empty();
         }
-        LocalDateTime entryTime = LocalDateTime.now();
-        this.addRecord(new ParkingRecord(car.platNumber(), entryTime));
+        Ticket ticket = new Ticket(car.plateNumber(), LocalDateTime.now(), parkingLotNumber);
+        this.parkedCars.put(ticket, car);
         this.remainingCapacity -= 1;
 
-        return Optional.of(new Ticket(car.platNumber(), entryTime, parkingLotNumber));
+        return Optional.of(ticket);
     }
 
-    private void addRecord(ParkingRecord parkingRecord) {
-        this.parkingRecords.add(parkingRecord);
-    }
-
-    public List<ParkingRecord> getParkingRecords() {
-        return this.parkingRecords;
-    }
-
-    public boolean carOut(Ticket ticket) {
+    public Car carOut(Ticket ticket) {
         // 当进入时间存在 且离开时间为null的时候才可以离开 - 历史记录已经离开了
-        var records = this.parkingRecords.stream().filter(parkingRecord -> parkingRecord.getPlatNumber().equals(ticket.platNumber()) && parkingRecord.getEntryTime() != null && parkingRecord.getLeaveTime() == null).toList();
-        if (records.size() == 1) {
-            records.get(0).setLeaveTime(LocalDateTime.now());
-            this.remainingCapacity += 1;
-            return true;
+        if (parkedCars.containsKey(ticket)) {
+            return parkedCars.remove(ticket);
         }
-
-        return false;
+        throw new CarNotFoundException();
     }
 
     public int getParkingLotNumber() {
         return parkingLotNumber;
+    }
+
+    public boolean hasSpace() {
+        return remainingCapacity > 0;
     }
 }
