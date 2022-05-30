@@ -10,29 +10,17 @@ import org.oobootcamp.parking.Ticket;
 import java.util.List;
 import java.util.Optional;
 
-public class GraduateParkingBoy {
-    List<ParkingLot> managedParkingLots;
+public class GraduateParkingBoy  extends ParkingBoy{
 
     public GraduateParkingBoy(List<ParkingLot> managedParkingLots) {
-        this.managedParkingLots = managedParkingLots;
+       super(managedParkingLots);
     }
 
-    private Optional<ParkingLot> findAvailableParkingLot() {
+    public Optional<ParkingLot> findAvailableParkingLot() {
         return managedParkingLots.stream()
                                  .filter(ParkingLot::hasSpace)
                                  .findFirst();
     }
 
-    Optional<Ticket> parkCar(Car car) throws NoAvailableParkingLotException {
-        ParkingLot parkingLot = findAvailableParkingLot().orElseThrow(NoAvailableParkingLotException::new);
-        return parkingLot.carIn(car);
-    }
 
-    Car pickCar(Ticket ticket) throws NoMatchedParkingLotException {
-        ParkingLot parkingLot = managedParkingLots.stream()
-                                                  .filter(n -> n.getParkingLotNumber() == ticket.parkingLotNumber())
-                                                  .findAny()
-                                                  .orElseThrow(NoMatchedParkingLotException::new);
-        return parkingLot.carOut(ticket);
-    }
 }
