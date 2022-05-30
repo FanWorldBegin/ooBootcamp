@@ -8,10 +8,11 @@ import org.oobootcamp.exception.NoMatchedParkingLotException;
 import org.oobootcamp.parking.Car;
 import org.oobootcamp.parking.ParkingLot;
 import org.oobootcamp.parking.Ticket;
+import org.oobootcamp.parkingboy.strategy.FirstMaxSpaceStrategy;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +22,7 @@ class SmartParkingBoyTest {
   @Test
   void should_return_a_ticket_when_boy_parking_a_car_given_a_parking_lot_with_space_and_a_car() throws Exception {
     ParkingLot parkingLotOne = new ParkingLot(2);
-    GraduateParkingBoy graduateParkingBoy = new GraduateParkingBoy(List.of(parkingLotOne));
+    ParkingBoy graduateParkingBoy =  new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLotOne);
     Car car = new Car("鄂A 88888");
 
     Optional<Ticket> ticket = graduateParkingBoy.parkCar(car);
@@ -34,7 +35,7 @@ class SmartParkingBoyTest {
     ParkingLot parkingLot1 = new ParkingLot(1);
     ParkingLot parkingLot2 = new ParkingLot(2);
     ParkingLot parkingLot3 = new ParkingLot(3);
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot1, parkingLot2, parkingLot3));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2, parkingLot3);
     Car car = new Car("鄂A 88888");
 
 
@@ -49,7 +50,7 @@ class SmartParkingBoyTest {
   void should_park_in_the_first_parking_lot_and_return_a_ticket_when_boy_parking_a_car_given_two_parking_lot_with_same_space_and_a_car() {
     ParkingLot parkingLot1 = new ParkingLot(1);
     ParkingLot parkingLot2 = new ParkingLot(1);
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot1, parkingLot2));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2);
     Car car = new Car("鄂A 88888");
 
 
@@ -63,7 +64,7 @@ class SmartParkingBoyTest {
   @Test
   void should_parking_failed_when_boy_parking_a_car_given_a_parking_lot_with_no_space_and_a_car() throws Exception {
     ParkingLot parkingLotOne = new ParkingLot(1);
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLotOne));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLotOne);
     Car car1 = new Car("鄂A 88888");
     Car car2 = new Car("鄂A 88887");
     smartParkingBoy.parkCar(car1);
@@ -81,7 +82,7 @@ class SmartParkingBoyTest {
     Car car2 = new Car("鄂A 88887");
     parkingLot1.carIn(car1);
     parkingLot2.carIn(car2);
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot2, parkingLot1));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2);
 
     Executable executable = () -> smartParkingBoy.parkCar(car2);
 
@@ -95,10 +96,9 @@ class SmartParkingBoyTest {
     ParkingLot parkingLot2 = new ParkingLot(2);
     Car car1 = new Car("鄂A 88888");
     Car car2 = new Car("鄂A 88887");
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot2, parkingLot1));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2);
     Optional<Ticket> ticket1 = smartParkingBoy.parkCar(car1);
     smartParkingBoy.parkCar(car2);
-
     Car findCar = smartParkingBoy.pickCar(ticket1.get());
 
     assertEquals(findCar, car1);
@@ -111,7 +111,7 @@ class SmartParkingBoyTest {
     ParkingLot parkingLot1 = new ParkingLot(1);
     ParkingLot parkingLot2 = new ParkingLot(1);
     Ticket ticket = new Ticket("鄂A 88888", LocalDateTime.now(), parkingLot1.getParkingLotNumber());
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot2, parkingLot1));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2);
 
     Executable executable = ()-> smartParkingBoy.pickCar(ticket);
 
@@ -122,8 +122,8 @@ class SmartParkingBoyTest {
   void should_failed_when_boy_pick_up_the_car_given_two_parking_lot_without_the_car_and_a_ticket_with_wrong_parking_lot_number() {
     ParkingLot parkingLot1 = new ParkingLot(1);
     ParkingLot parkingLot2 = new ParkingLot(1);
-    Ticket ticket = new Ticket("鄂A 88888", LocalDateTime.now(), 1);
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot2, parkingLot1));
+    Ticket ticket = new Ticket("鄂A 88888", LocalDateTime.now(), UUID.randomUUID().toString());
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2);
 
     Executable executable = () ->  smartParkingBoy.pickCar(ticket);
 
@@ -137,7 +137,7 @@ class SmartParkingBoyTest {
     ParkingLot parkingLot2 = new ParkingLot(1);
     Car car1 = new Car("鄂A 88888");
     Car car2 = new Car("鄂A 88887");
-    SmartParkingBoy smartParkingBoy = new SmartParkingBoy(List.of(parkingLot2, parkingLot1));
+    ParkingBoy smartParkingBoy = new ParkingBoy(new FirstMaxSpaceStrategy(), parkingLot1, parkingLot2);
     Optional<Ticket> ticket1 = smartParkingBoy.parkCar(car1);
     smartParkingBoy.parkCar(car2);
     smartParkingBoy.pickCar(ticket1.get());

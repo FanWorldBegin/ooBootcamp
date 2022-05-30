@@ -7,12 +7,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ParkingLot {
     private int capacity;
     private int remainingCapacity;
     private final Map<Ticket, Car> parkedCars;
-    private final int parkingLotNumber;
+    private final String parkingLotNumber;
 
     public ParkingLot(int capacity) {
         if (capacity < 1) {
@@ -21,7 +22,7 @@ public class ParkingLot {
         this.capacity = capacity;
         this.remainingCapacity = capacity;
         this.parkedCars = new HashMap<>();
-        parkingLotNumber = (int) System.currentTimeMillis();
+        parkingLotNumber = UUID.randomUUID().toString();
     }
 
     public int getCapacity() {
@@ -59,7 +60,7 @@ public class ParkingLot {
         throw new CarNotFoundException();
     }
 
-    public int getParkingLotNumber() {
+    public String getParkingLotNumber() {
         return parkingLotNumber;
     }
 
